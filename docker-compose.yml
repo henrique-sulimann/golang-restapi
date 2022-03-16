@@ -1,0 +1,32 @@
+version: "3.3"
+services:
+  mongodb:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    deploy:
+      restart_policy:
+        condition: on-failure
+    networks:
+      interna:
+    ports:
+      - 27023:27017
+
+  sulimannapp:
+    image: hsulimann/sulimannapp:1.0
+    environment:
+      DATABASE_USER: root
+      DATABASE_PASS: 123456
+      DATABASE_SERVER: mongodb
+      DATABASE_PORT: 27017
+    deploy:
+      restart_policy:
+        condition: on-failure
+    ports:
+      - 3000:3000
+    networks:
+      interna:
+
+networks:
+  interna:
