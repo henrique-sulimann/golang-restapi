@@ -34,4 +34,4 @@ stages:
         containerRegistry: 'dockerhub-hsulimann'
         repository: 'golang-restapi'
         command: 'push'
-        tags: '$(Build.BuildId)'
+        tags: 'hsulimann/$(Build.BuildId)'
