@@ -32,6 +32,6 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'dockerhub-hsulimann'
-        repository: 'golang-restapi'
+        repository: 'hsulimann/golang-restapi'
         command: 'push'
         tags: '$(Build.BuildId)'
