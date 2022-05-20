@@ -18,11 +18,23 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 		}
 		gamesMongo := main.Group("gamesmongo")
 		{
-			gamesMongo.GET("/:id", controllers.ShowGameMongo)
+			gamesMongo.GET("/:id", controllers.ShowGameMongoByID)
 			gamesMongo.GET("/", controllers.ShowGamesMongo)
 			gamesMongo.POST("/", controllers.CreateGameMongo)
-			gamesMongo.PUT("/:id", controllers.UpdateGameMongo)
+			gamesMongo.PUT("/:id", controllers.UpdateGameMongoByID)
 			gamesMongo.DELETE("/:id", controllers.DeleteGameMongo)
+		}
+		usersMongo := main.Group("usersmongo")
+		{
+			usersMongo.GET("/:id", controllers.ShowUserMongoByID)
+			usersMongo.GET("/", controllers.ShowUsersMongo)
+			usersMongo.POST("/", controllers.CreateUserMongo)
+			usersMongo.PUT("/:id", controllers.UpdateUserMongoByID)
+			usersMongo.DELETE("/:id", controllers.DeleteUserMongoByID)
+		}
+		login := main.Group("login")
+		{
+			login.POST("/", controllers.Login)
 		}
 	}
 	return router

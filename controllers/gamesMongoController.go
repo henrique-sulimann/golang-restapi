@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -13,13 +14,28 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var collection *mongo.Collection = database.GetCollection(database.MONGO, "games")
+var collectionGames *mongo.Collection = database.GetCollection(database.MONGO, "games")
 
 func ShowGamesMongo(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var games []models.GameMongo
 	defer cancel()
-	cur, err := collection.Find(ctx, bson.D{{}})
+	tokenAuth, err := ExtractTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	userId, err := FetchAuth(tokenAuth)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	fmt.Println(userId)
+	cur, err := collectionGames.Find(ctx, bson.D{{}})
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "error getting games: " + err.Error(),
@@ -30,15 +46,6 @@ func ShowGamesMongo(c *gin.Context) {
 	if err := cur.All(ctx, &games); err != nil {
 		log.Fatal("error: ", err)
 	}
-	// for cur.Next(ctx) {
-	// 	var game models.GameMongo
-	// 	err := cur.Decode(&game)
-	// 	if err != nil {
-	// 		log.Fatal("error decoding game")
-	// 	}
-	// 	games = append(games, game)
-	// }
-	// log.Println("games: ", games)
 	c.JSON(200, games)
 }
 
@@ -46,7 +53,22 @@ func CreateGameMongo(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var game models.GameMongo
 	defer cancel()
-	err := c.ShouldBindJSON(&game)
+	tokenAuth, err := ExtractTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	userId, err := FetchAuth(tokenAuth)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	fmt.Println(userId)
+	err = c.ShouldBindJSON(&game)
 	if err != nil {
 		c.JSON(400, gin.H{
 			"message": "invalid json",
@@ -60,7 +82,7 @@ func CreateGameMongo(c *gin.Context) {
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
-	res, err := collection.InsertOne(ctx, newGame)
+	res, err := collectionGames.InsertOne(ctx, newGame)
 	if err != nil {
 		log.Fatal("error: ", err)
 	}
@@ -69,10 +91,25 @@ func CreateGameMongo(c *gin.Context) {
 	c.JSON(200, newGame)
 }
 
-func ShowGameMongo(c *gin.Context) {
+func ShowGameMongoByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	var game models.GameMongo
 	defer cancel()
+	tokenAuth, err := ExtractTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	userId, err := FetchAuth(tokenAuth)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	fmt.Println(userId)
 	id := c.Param("id")
 	newid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -81,7 +118,7 @@ func ShowGameMongo(c *gin.Context) {
 		})
 		return
 	}
-	err = collection.FindOne(ctx, bson.M{"id": newid}).Decode(&game)
+	err = collectionGames.FindOne(ctx, bson.M{"id": newid}).Decode(&game)
 	if err != nil {
 		c.JSON(404, gin.H{
 			"message": "game not found",
@@ -91,9 +128,24 @@ func ShowGameMongo(c *gin.Context) {
 	c.JSON(200, game)
 }
 
-func UpdateGameMongo(c *gin.Context) {
+func UpdateGameMongoByID(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
+	tokenAuth, err := ExtractTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	userId, err := FetchAuth(tokenAuth)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	fmt.Println(userId)
 	id := c.Param("id")
 	newid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -110,7 +162,7 @@ func UpdateGameMongo(c *gin.Context) {
 		})
 		return
 	}
-	_, err = collection.UpdateOne(ctx, bson.M{"id": newid}, bson.M{"$set": bson.M{
+	_, err = collectionGames.UpdateOne(ctx, bson.M{"id": newid}, bson.M{"$set": bson.M{
 		"name":        game.Name,
 		"description": game.Description,
 		"updatedat":   time.Now(),
@@ -127,6 +179,21 @@ func DeleteGameMongo(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	id := c.Param("id")
+	tokenAuth, err := ExtractTokenMetadata(c.Request)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	userId, err := FetchAuth(tokenAuth)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
+	fmt.Println(userId)
 	newid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		c.JSON(400, gin.H{
@@ -134,7 +201,7 @@ func DeleteGameMongo(c *gin.Context) {
 		})
 		return
 	}
-	_, err = collection.DeleteOne(ctx, bson.M{"id": newid})
+	_, err = collectionGames.DeleteOne(ctx, bson.M{"id": newid})
 	if err != nil {
 		c.JSON(500, gin.H{
 			"message": "error deleting game",
