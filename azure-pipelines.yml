@@ -39,6 +39,6 @@ stages:
         namespace: 'default'
         command: 'upgrade'
         chartType: 'Name'
-        chartName: 'golang-restapi'
+        chartName: 'hsulimann-repository/golang-restapi'
         releaseName: 'golang-restapi'
         overrideValues: 'golang.image=$(image):$(tag)'
