@@ -41,4 +41,4 @@ stages:
         chartType: 'Name'
         chartName: 'hsulimann-repository/golang-restapi'
         releaseName: 'golang-restapi'
-        overrideValues: 'golang.image=$(image):$(tag)'
+        overrideValues: 'golang.image.tag=$(tag)'
