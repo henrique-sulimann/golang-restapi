@@ -28,3 +28,5 @@ stages:
         repository: 'hsulimann/golang-restapi'
         command: 'buildAndPush'
         Dockerfile: '**/Dockerfile'
+    - script: |
+        helm repo add --username henrique.sulimann@gmail.com --password $(GITHUB-TOKEN)  hsulimann-repository https://henrique-sulimann.github.io/helm-repository/ 
