@@ -1,12 +1,14 @@
 package database
 
 import (
+	"os"
+
 	"github.com/go-redis/redis/v7"
 )
 
 func StartRedis() *redis.Client {
-	dsn := "localhost:16379"
-	// dsn := os.Getenv("REDIS_DSN")
+	// dsn := "localhost:16379"
+	dsn := os.Getenv("REDIS_DSN")
 	client := redis.NewClient(&redis.Options{
 		Addr: dsn,
 	})
