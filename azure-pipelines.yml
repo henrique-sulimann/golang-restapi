@@ -1,5 +1,6 @@
 # Docker
 
+
 # Build a Docker image
 # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
@@ -31,4 +32,14 @@ stages:
     - script: |
         helm repo add --username henrique.sulimann@gmail.com --password $(GITHUB-TOKEN)  hsulimann-repository https://henrique-sulimann.github.io/helm-repository/
         helm repo update
-        helm upgrade -i golang-restapi hsulimann-repository/golang-restapi --set golang.image=$(image)$(tag) -n default
+    - task: HelmDeploy@0
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceConnection: 'hsulimann-aks'
+        namespace: 'default'
+        command: 'upgrade'
+        chartType: 'Name'
+        chartName: 'golang-restapi'
+        chartVersion: '0.1.0'
+        releaseName: 'golang-restapi'
+        overrideValues: 'golang.image=$(image):$(tag)'
