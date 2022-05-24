@@ -29,6 +29,33 @@ steps:
     entrypoint: bash
     secretEnv:
       - USERNAME
+  - name: gcr.io/cloud-builders/gcloud
+    id: Add Kubernetes Context
+    entrypoint: bash
+    args:
+      - "-c"
+      - "gcloud container clusters get-credentials gke-hsulimann --region us-east1 --project sulimann"
+  - name: gcr.io/$PROJECT_ID/helm
+    id: Add Chart Helm Repo
+    args:
+      - "repo"
+      - "add"
+      - "--username $$EMAIL"
+      - "--password $$GITHUB_TOKEN"
+      - "hsulimann-repository"
+      - "https://henrique-sulimann.github.io/helm-repository/"
+  - name: gcr.io/$PROJECT_ID/helm
+    id: Add Chart Helm Repo
+    env:
+      - REV=$REVISION_ID
+    args:
+      - "upgrade"
+      - "--kube-context=gke_sulimann_us-east1_gke-hsulimann"
+      - "-i"
+      - "golang-restapi"
+      - "hsulimann-repository/golang-restapi"
+      - "--set"
+      - "golang.image.tag=$$REV"
 options:
   logging: CLOUD_LOGGING_ONLY
 availableSecrets:
@@ -37,3 +64,7 @@ availableSecrets:
       env: PASSWORD
     - versionName: projects/917157521095/secrets/dockerhub-user/versions/1
       env: USERNAME
+    - versionName: projects/917157521095/secrets/github-email/versions/1
+      env: EMAIL
+    - versionName: projects/917157521095/secrets/github-token/versions/1
+      env: GITHUB_TOKEN
