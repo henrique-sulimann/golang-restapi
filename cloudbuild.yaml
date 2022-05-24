@@ -41,24 +41,13 @@ steps:
       - EMAIL
       - GITHUB_TOKEN
     args:
-      - "repo"
-      - "add"
-      - "--username $$EMAIL"
-      - "--password $$GITHUB_TOKEN"
-      - "hsulimann-repository"
-      - "https://henrique-sulimann.github.io/helm-repository/"
+      - "repo add --username $$EMAIL --password $$GITHUB_TOKEN hsulimann-repository https://henrique-sulimann.github.io/helm-repository/"
   - name: alpine/helm
     # id: Add Chart Helm Repo
     env:
       - REV=$REVISION_ID
     args:
-      - "upgrade"
-      - "--kube-context=gke_sulimann_us-east1_gke-hsulimann"
-      - "-i"
-      - "golang-restapi"
-      - "hsulimann-repository/golang-restapi"
-      - "--set"
-      - "golang.image.tag=$$REV"
+      - "upgrade --kube-context=gke_sulimann_us-east1_gke-hsulimann -i golang-restapi hsulimann-repository/golang-restapi --set golang.image.tag=$$REV"
 options:
   logging: CLOUD_LOGGING_ONLY
 availableSecrets:
