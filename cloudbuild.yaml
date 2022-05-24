@@ -1,0 +1,39 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - '-c'
+      - docker login --username=$$USERNAME --password=$$PASSWORD
+    entrypoint: bash
+    secretEnv:
+      - USERNAME
+      - PASSWORD
+  - name: gcr.io/cloud-builders/docker
+    env:
+      - REPO_NAME=$REPO_NAME
+      - TAG_NAME=$TAG_NAME
+      - REV=$REVISION_ID
+    args:
+      - '-c'
+      - 'docker build --tag $$USERNAME/$$REPO_NAME:$$REV ./'
+    entrypoint: bash
+    secretEnv:
+      - USERNAME
+  - name: gcr.io/cloud-builders/docker
+    env:
+      - REPO_NAME=$REPO_NAME
+      - TAG_NAME=$TAG_NAME
+      - REV=$REVISION_ID
+    args:
+      - '-c'
+      - 'docker push $$USERNAME/$$REPO_NAME:$$REV'
+    entrypoint: bash
+    secretEnv:
+      - USERNAME
+options:
+  logging: CLOUD_LOGGING_ONLY
+availableSecrets:
+  secretManager:
+    - versionName: projects/917157521095/secrets/dockerhub-password/versions/1
+      env: PASSWORD
+    - versionName: projects/917157521095/secrets/dockerhub-user/versions/1
+      env: USERNAME
