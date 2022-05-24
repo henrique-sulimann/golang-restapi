@@ -36,7 +36,7 @@ steps:
       - "-c"
       - "gcloud container clusters get-credentials gke-hsulimann --region us-east1 --project sulimann"
   - name: gcr.io/$PROJECT_ID/helm
-    id: Add Chart Helm Repo
+    # id: Add Chart Helm Repo
     args:
       - "repo"
       - "add"
@@ -45,7 +45,7 @@ steps:
       - "hsulimann-repository"
       - "https://henrique-sulimann.github.io/helm-repository/"
   - name: gcr.io/$PROJECT_ID/helm
-    id: Add Chart Helm Repo
+    # id: Add Chart Helm Repo
     env:
       - REV=$REVISION_ID
     args:
