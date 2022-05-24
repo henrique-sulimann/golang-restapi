@@ -35,7 +35,7 @@ steps:
     args:
       - "-c"
       - "gcloud container clusters get-credentials gke-hsulimann --region us-east1 --project sulimann"
-  - name: gcr.io/$PROJECT_ID/cloud-builders-helm
+  - name: gcr.io/cloud-builders/helm
     # id: Add Chart Helm Repo
     entrypoint: /bin/sh
     secretEnv:
@@ -44,7 +44,7 @@ steps:
     args:
       - "-c"
       - "helm repo add --username $$EMAIL --password $$GITHUB_TOKEN hsulimann-repository https://henrique-sulimann.github.io/helm-repository/"
-  - name: gcr.io/$PROJECT_ID/cloud-builders-helm
+  - name: gcr.io/cloud-builders/helm
     # id: Add Chart Helm Repo
     entrypoint: bash
     env:
