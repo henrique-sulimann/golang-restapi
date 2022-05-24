@@ -1,66 +1,66 @@
-steps:
-  - name: gcr.io/cloud-builders/docker
-    args:
-      - '-c'
-      - docker login --username=$$USERNAME --password=$$PASSWORD
-    entrypoint: bash
-    secretEnv:
-      - USERNAME
-      - PASSWORD
-  - name: gcr.io/cloud-builders/docker
-    env:
-      - REPO_NAME=$REPO_NAME
-      - TAG_NAME=$TAG_NAME
-      - REV=$REVISION_ID
-    args:
-      - '-c'
-      - 'docker build --tag $$USERNAME/$$REPO_NAME:$$REV ./'
-    entrypoint: bash
-    secretEnv:
-      - USERNAME
-  - name: gcr.io/cloud-builders/docker
-    env:
-      - REPO_NAME=$REPO_NAME
-      - TAG_NAME=$TAG_NAME
-      - REV=$REVISION_ID
-    args:
-      - '-c'
-      - 'docker push $$USERNAME/$$REPO_NAME:$$REV'
-    entrypoint: bash
-    secretEnv:
-      - USERNAME
-  - name: gcr.io/cloud-builders/gcloud
-    id: Add Kubernetes Context
-    entrypoint: bash
-    args:
-      - "-c"
-      - "gcloud container clusters get-credentials gke-hsulimann --region us-east1 --project sulimann"
-  - name: gcr.io/cloud-builders/helm
-    # id: Add Chart Helm Repo
-    entrypoint: /bin/sh
-    secretEnv:
-      - EMAIL
-      - GITHUB_TOKEN
-    args:
-      - "-c"
-      - "helm repo add --username $$EMAIL --password $$GITHUB_TOKEN hsulimann-repository https://henrique-sulimann.github.io/helm-repository/"
-  - name: gcr.io/cloud-builders/helm
-    # id: Add Chart Helm Repo
-    entrypoint: bash
-    env:
-      - REV=$REVISION_ID
-    args:
-      - "-c"
-      - "helm upgrade -i golang-restapi hsulimann-repository/golang-restapi --set golang.image.tag=$$REV"
-options:
-  logging: CLOUD_LOGGING_ONLY
-availableSecrets:
-  secretManager:
-    - versionName: projects/917157521095/secrets/dockerhub-password/versions/1
-      env: PASSWORD
-    - versionName: projects/917157521095/secrets/dockerhub-user/versions/1
-      env: USERNAME
-    - versionName: projects/917157521095/secrets/github-email/versions/1
-      env: EMAIL
-    - versionName: projects/917157521095/secrets/github-token/versions/1
-      env: GITHUB_TOKEN
+# steps:
+#   - name: gcr.io/cloud-builders/docker
+#     args:
+#       - '-c'
+#       - docker login --username=$$USERNAME --password=$$PASSWORD
+#     entrypoint: bash
+#     secretEnv:
+#       - USERNAME
+#       - PASSWORD
+#   - name: gcr.io/cloud-builders/docker
+#     env:
+#       - REPO_NAME=$REPO_NAME
+#       - TAG_NAME=$TAG_NAME
+#       - REV=$REVISION_ID
+#     args:
+#       - '-c'
+#       - 'docker build --tag $$USERNAME/$$REPO_NAME:$$REV ./'
+#     entrypoint: bash
+#     secretEnv:
+#       - USERNAME
+#   - name: gcr.io/cloud-builders/docker
+#     env:
+#       - REPO_NAME=$REPO_NAME
+#       - TAG_NAME=$TAG_NAME
+#       - REV=$REVISION_ID
+#     args:
+#       - '-c'
+#       - 'docker push $$USERNAME/$$REPO_NAME:$$REV'
+#     entrypoint: bash
+#     secretEnv:
+#       - USERNAME
+#   - name: gcr.io/cloud-builders/gcloud
+#     id: Add Kubernetes Context
+#     entrypoint: bash
+#     args:
+#       - "-c"
+#       - "gcloud container clusters get-credentials gke-hsulimann --region us-east1 --project sulimann"
+#   - name: gcr.io/cloud-builders/helm
+#     # id: Add Chart Helm Repo
+#     entrypoint: /bin/sh
+#     secretEnv:
+#       - EMAIL
+#       - GITHUB_TOKEN
+#     args:
+#       - "-c"
+#       - "helm repo add --username $$EMAIL --password $$GITHUB_TOKEN hsulimann-repository https://henrique-sulimann.github.io/helm-repository/"
+#   - name: gcr.io/cloud-builders/helm
+#     # id: Add Chart Helm Repo
+#     entrypoint: bash
+#     env:
+#       - REV=$REVISION_ID
+#     args:
+#       - "-c"
+#       - "helm upgrade -i golang-restapi hsulimann-repository/golang-restapi --set golang.image.tag=$$REV"
+# options:
+#   logging: CLOUD_LOGGING_ONLY
+# availableSecrets:
+#   secretManager:
+#     - versionName: projects/917157521095/secrets/dockerhub-password/versions/1
+#       env: PASSWORD
+#     - versionName: projects/917157521095/secrets/dockerhub-user/versions/1
+#       env: USERNAME
+#     - versionName: projects/917157521095/secrets/github-email/versions/1
+#       env: EMAIL
+#     - versionName: projects/917157521095/secrets/github-token/versions/1
+#       env: GITHUB_TOKEN
