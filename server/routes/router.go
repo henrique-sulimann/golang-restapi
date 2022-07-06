@@ -28,10 +28,6 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 		{
 			login.POST("/", controllers.Login)
 		}
-		exemplo := main.Group("teste")
-		{
-			exemplo.GET("/", controllers.Teste)
-		}
 	}
 	return router
 }
