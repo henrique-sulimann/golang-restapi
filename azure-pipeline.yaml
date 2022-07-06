@@ -1,53 +1,53 @@
-# Docker
+# # Docker
 
 
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# # Build a Docker image
+# # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
-trigger:
-- main
+# trigger:
+# - main
 
-resources:
-- repo: self
+# resources:
+# - repo: self
 
-variables:
-  tag: '$(Build.BuildId)'
-  image: "hsulimann/golang-restapi"
+# variables:
+#   tag: '$(Build.BuildId)'
+#   image: "hsulimann/golang-restapi"
 
-stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: Docker@2
-      inputs:
-        containerRegistry: 'dockerhub-hsulimann'
-        repository: 'hsulimann/golang-restapi'
-        command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
-- stage:
-  displayName: Deploy With Helm
-  jobs:
-    - job: Deploy
-      displayName: Add Repo
-      pool:
-        vmImage: ubuntu-latest
-      steps:
-      - script: |
-          helm repo add --username henrique.sulimann@gmail.com --password $(TOKEN)  hsulimann-repository https://henrique-sulimann.github.io/helm-repository/
-          helm repo update
-        displayName: Helm repo ADD
-      - task: HelmDeploy@0
-        inputs:
-          connectionType: 'Kubernetes Service Connection'
-          kubernetesServiceConnection: 'hsulimann-aks'
-          namespace: 'default'
-          command: 'upgrade'
-          chartType: 'Name'
-          chartName: 'hsulimann-repository/golang-restapi'
-          releaseName: 'golang-restapi'
-          overrideValues: 'golang.image.tag=$(tag)'
+# stages:
+# - stage: Build
+#   displayName: Build image
+#   jobs:
+#   - job: Build
+#     displayName: Build
+#     pool:
+#       vmImage: ubuntu-latest
+#     steps:
+#     - task: Docker@2
+#       inputs:
+#         containerRegistry: 'dockerhub-hsulimann'
+#         repository: 'hsulimann/golang-restapi'
+#         command: 'buildAndPush'
+#         Dockerfile: '**/Dockerfile'
+# - stage:
+#   displayName: Deploy With Helm
+#   jobs:
+#     - job: Deploy
+#       displayName: Add Repo
+#       pool:
+#         vmImage: ubuntu-latest
+#       steps:
+#       - script: |
+#           helm repo add --username henrique.sulimann@gmail.com --password $(TOKEN)  hsulimann-repository https://henrique-sulimann.github.io/helm-repository/
+#           helm repo update
+#         displayName: Helm repo ADD
+#       - task: HelmDeploy@0
+#         inputs:
+#           connectionType: 'Kubernetes Service Connection'
+#           kubernetesServiceConnection: 'hsulimann-aks'
+#           namespace: 'default'
+#           command: 'upgrade'
+#           chartType: 'Name'
+#           chartName: 'hsulimann-repository/golang-restapi'
+#           releaseName: 'golang-restapi'
+#           overrideValues: 'golang.image.tag=$(tag)'
