@@ -1,8 +1,6 @@
 package routes
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/henrique-sulimann/golang-restapi/controllers"
 )
@@ -32,7 +30,7 @@ func ConfigRoutes(router *gin.Engine) *gin.Engine {
 		}
 		exemplo := main.Group("teste")
 		{
-			exemplo.GET("/", fmt.Println("teste"))
+			exemplo.GET("/", controllers.Teste)
 		}
 	}
 	return router
